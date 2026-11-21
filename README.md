@@ -13,3 +13,35 @@ The notebook shows how I generated the extra examples, trained both
 versions, evaluated them, and inspected prediction errors.
 
 Starter code: https://github.com/nicher92/swedish_correctness_classifier
+
+## Model and training data
+
+- Model: https://huggingface.co/nehatanzilaahsan/swedish-grammaticality-svr
+- Training data: https://huggingface.co/datasets/nehatanzilaahsan/swedish-grammaticality-training
+
+## Run prediction
+
+From the repository root, install the dependencies and download the trained SVR:
+
+```bash
+python -m pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+curl -fL https://huggingface.co/nehatanzilaahsan/swedish-grammaticality-svr/resolve/main/svr.joblib -o svr.joblib
+python predict.py --input test.jsonl --output scores.jsonl
+```
+
+Each line of `test.jsonl` must contain an `id` and a `text` field.
+The script downloads the ModernBERT encoder on first use and writes
+one `id` and `score` per input line.
+
+## Reproduce training
+
+With the same dependencies installed, download the 578-example training
+set to the path expected by `train.py`:
+
+```bash
+mkdir -p data
+curl -fL https://huggingface.co/datasets/nehatanzilaahsan/swedish-grammaticality-training/resolve/main/train_augmented.jsonl -o data/train.jsonl
+python train.py
+```
+
+Training uses seed 0 and saves the fitted regressor as `svr.joblib`.
